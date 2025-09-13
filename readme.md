@@ -21,7 +21,7 @@ pip install numpy opencv-python ultralytics
 ```
 
 ## Package Structure
-- `point_cloud_pose_estimator/football_detector_node.py`: Detects football in images and publishes pixel coordinates.
+- `point_cloud_pose_estimator/football_detect.py`: Detects football in images and publishes pixel coordinates.
 - `point_cloud_pose_estimator/point_estimator_node.py`: Estimates 3D pose from pixel coordinates and point cloud.
 
 ## Setup
@@ -52,7 +52,7 @@ pip install numpy opencv-python ultralytics
 ## Usage
 1. **Run the FootballDetectorNode**:
    ```bash
-   ros2 run point_cloud_pose_estimator football_detector_node
+   ros2 run point_cloud_pose_estimator football_detect
    ```
    - Subscribes to `/camera_image` (sensor_msgs/Image).
    - Publishes to `/pixel_coordinates` (geometry_msgs/Point) and `/football_detector/image` (sensor_msgs/Image).
@@ -79,7 +79,7 @@ pip install numpy opencv-python ultralytics
 3. **Example launch**:
    Run both nodes together (create a launch file or run separately):
    ```bash
-   ros2 run point_cloud_pose_estimator football_detector_node &
+   ros2 run point_cloud_pose_estimator football_detect &
    ros2 run point_cloud_pose_estimator point_estimator_node
    ```
 
