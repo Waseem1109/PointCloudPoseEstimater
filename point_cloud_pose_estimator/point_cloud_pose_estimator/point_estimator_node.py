@@ -14,27 +14,34 @@ class PointEstimatorNode(Node):
         self.declare_parameter('base_frame', 'panda_linkG')
         self.declare_parameter('camera_frame', 'camera_link')
         self.declare_parameter('transform_timeout', 1.0)
-        self.declare_parameter('search_radius', 10)  # New parameter for pixel search radius
+        self.declare_parameter('search_radius', 10)
+        self.declare_parameter('point_cloud_topic', '/depth_camera/points')
+        self.declare_parameter('pixel_coordinates_topic', '/pixel_coordinates')
+        self.declare_parameter('object_pose_topic', '/object_pose')
+
         self.base_frame = self.get_parameter('base_frame').get_parameter_value().string_value
         self.camera_frame = self.get_parameter('camera_frame').get_parameter_value().string_value
         self.transform_timeout = self.get_parameter('transform_timeout').get_parameter_value().double_value
         self.search_radius = self.get_parameter('search_radius').get_parameter_value().integer_value
+        self.point_cloud_topic = self.get_parameter('point_cloud_topic').get_parameter_value().string_value
+        self.pixel_coordinates_topic = self.get_parameter('pixel_coordinates_topic').get_parameter_value().string_value
+        self.object_pose_topic = self.get_parameter('object_pose_topic').get_parameter_value().string_value
 
         self.cloud_sub = self.create_subscription(
             PointCloud2,
-            '/depth_camera/points',
+            self.point_cloud_topic,
             self.cloud_callback,
             10
         )
         self.pixel_sub = self.create_subscription(
             Point,
-            '/pixel_coordinates',
+            self.pixel_coordinates_topic,
             self.pixel_callback,
             10
         )
         self.pose_pub = self.create_publisher(
             PoseStamped,
-            '/object_pose',
+            self.object_pose_topic,
             10
         )
         self.tf_buffer = Buffer()
@@ -43,7 +50,13 @@ class PointEstimatorNode(Node):
         self.cloud_lock = Lock()
 
         self.get_logger().info('Point Estimator Node has been started.')
-        self.get_logger().info(f'Configured base_frame: {self.base_frame}, camera_frame: {self.camera_frame}, search_radius: {self.search_radius}')
+        self.get_logger().info(
+            f'Configured parameters: base_frame={self.base_frame}, '
+            f'camera_frame={self.camera_frame}, search_radius={self.search_radius}, '
+            f'point_cloud_topic={self.point_cloud_topic}, '
+            f'pixel_coordinates_topic={self.pixel_coordinates_topic}, '
+            f'object_pose_topic={self.object_pose_topic}'
+        )
 
     def cloud_callback(self, msg):
         with self.cloud_lock:
